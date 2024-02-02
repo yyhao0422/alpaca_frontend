@@ -1,12 +1,10 @@
-import DesktopWrapper from "./components/Wrapper/DesktopWrapper";
-import TopNavigationBar from "./components/Navigation Bar/topNavigationBar";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
 
 function App() {
   return (
     <>
-      <DesktopWrapper />
-      <TopNavigationBar />
-      <h1 className="text-blue-700 m-4">Hello World !</h1>
+      <RouterProvider router={router} />
     </>
   );
 }

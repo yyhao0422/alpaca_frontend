@@ -1,6 +1,6 @@
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import alpacaLogo from "../../assets/alpacaLogo.png";
 
@@ -23,9 +23,42 @@ function TopNavigationBar() {
       </div>
       {/* Navigation Page */}
       <div className="flex mx-48 pt-3 ">
-        <a className="m-2 mb-4">Community</a>
-        <a className="m-2 mb-4">Classroom</a>
-        <a className="m-2 mb-4">About</a>
+        <NavLink
+          to="/"
+          className={({ isActive, isPending }) =>
+            isPending
+              ? "m-2 mb-4"
+              : isActive
+              ? "m-2 mb-4 underline underline-offset-[10px]"
+              : "m-2 mb-4"
+          }
+        >
+          Community
+        </NavLink>
+        <NavLink
+          to="/classroom"
+          className={({ isActive, isPending }) =>
+            isPending
+              ? "m-2 mb-4"
+              : isActive
+              ? "m-2 mb-4 underline underline-offset-[10px]"
+              : "m-2 mb-4"
+          }
+        >
+          Classroom
+        </NavLink>
+        <NavLink
+          to="/about"
+          className={({ isActive, isPending }) =>
+            isPending
+              ? "m-2 mb-4"
+              : isActive
+              ? "m-2 mb-4 underline underline-offset-[10px]"
+              : "m-2 mb-4"
+          }
+        >
+          About
+        </NavLink>
       </div>
     </div>
   );
