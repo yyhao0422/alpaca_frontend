@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 
-import Sidebar from "../components/Sidebar";
-import VideoContent from "../components/VideoContent";
-import TextContent from "../components/TextContent";
-import { Card } from "@mui/material";
+import Sidebar from "./components/Sidebar";
+import VideoContent from "./components/VideoContent";
+import TextContent from "./components/TextContent";
 
-function ManageClassroomPage() {
+function ClassroomPage() {
   const [contentData, setContentData] = useState({});
   const { id } = useParams();
   let location = useLocation();
@@ -39,4 +38,4 @@ function ManageClassroomPage() {
   );
 }
 
-export default ManageClassroomPage;
+export default ClassroomPage;

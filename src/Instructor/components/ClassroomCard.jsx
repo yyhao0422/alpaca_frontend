@@ -3,9 +3,15 @@ import alpacaLogo from "../../assets/alpacaLogo.png";
 import { Link, useLocation } from "react-router-dom";
 
 function ClassroomCard({ data }) {
+  console.log(data);
   return (
     <Link
-      to={"/instructor/classroom/manage/" + data._id}
+      to={
+        "/instructor/classroom/manage/" +
+        data._id +
+        "/" +
+        (data.sections.length !== 0 ? data.sections[0]._id : "empty")
+      }
       state={{ classroomData: data }}
       className=" mt-10 w-fill flex cursor-pointer group"
     >
@@ -26,7 +32,16 @@ function ClassroomCard({ data }) {
         </div>
         <div className="m-3 group-hover:blur-sm">
           <Typography variant="h6">{data.title}</Typography>
-          <Typography variant="subtitle1" sx={{ marginTop: "10px" }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              maxWidth: "900px",
+              marginTop: "10px",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+          >
             {data.description}
           </Typography>
         </div>

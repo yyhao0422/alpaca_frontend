@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import Community from "./pages/Community/Community";
-import Classroom from "./pages/Classroom/Classroom";
+import Classrooms from "./pages/Classroom/Classrooms.jsx";
+import ClassroomPage from "./pages/Classroom/ClassroomPage";
 import About from "./pages/About/About";
 import WebLayout from "./components/WebLayout";
 import Instructor from "./Instructor/pages/Instructor.jsx";
@@ -14,7 +15,8 @@ export const router = createBrowserRouter([
     element: <WebLayout />,
     children: [
       { index: true, element: <Community /> },
-      { path: "classroom", element: <Classroom /> },
+      { path: "classroom", element: <Classrooms /> },
+      { path: "classroom/:id", element: <ClassroomPage /> },
       { path: "about", element: <About /> },
       { path: "instructor", element: <Instructor /> },
       {
@@ -22,7 +24,7 @@ export const router = createBrowserRouter([
         element: <CreateClassroomPage />,
       },
       {
-        path: "instructor/classroom/manage/:id",
+        path: "instructor/classroom/manage/:id/:subSectionId",
         element: <ManageClassroomPage />,
       },
     ],
