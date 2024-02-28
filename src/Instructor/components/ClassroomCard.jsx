@@ -10,9 +10,12 @@ function ClassroomCard({ data }) {
         "/instructor/classroom/manage/" +
         data._id +
         "/" +
-        (data.sections.length !== 0 ? data.sections[0]._id : "empty")
+        (data.sections.length !== 0 ? data.sections[0]._id : "empty") +
+        "/" +
+        (data.sections.length !== 0 && data.sections[0].subsections.length !== 0
+          ? data.sections[0].subsections[0]._id
+          : "empty")
       }
-      state={{ classroomData: data }}
       className=" mt-10 w-fill flex cursor-pointer group"
     >
       <Card sx={{ width: "100%", height: "100px", display: "flex" }}>

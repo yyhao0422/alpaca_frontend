@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
         element: <CreateClassroomPage />,
       },
       {
-        path: "instructor/classroom/manage/:id/:subSectionId",
+        path: "instructor/classroom/manage/:id/:sectionId/:subSectionId",
         element: <ManageClassroomPage />,
       },
     ],

@@ -8,7 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import UploadIcon from "@mui/icons-material/Upload";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-function Sidebar({ classroomData, onShow }) {
+function Sidebar({ classroomData }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -62,13 +62,7 @@ function Sidebar({ classroomData, onShow }) {
         aria-labelledby="nested-list-subheader"
       >
         {classroomData.sections.map((section) => {
-          return (
-            <SidebarItem
-              key={section._id}
-              section={section}
-              onShow={(data) => onShow(data)}
-            />
-          );
+          return <SidebarItem key={section._id} section={section} />;
         })}
         <div className="text-center cursor-pointer mt-5 text-gray-400 hover:text-gray-800">
           <AddCircleOutlineIcon sx={{ marginRight: "5px" }} />

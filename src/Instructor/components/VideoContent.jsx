@@ -13,8 +13,6 @@ function VideoContent({ videoUrl }) {
     <ReactPlayer
       url={videoUrl}
       controls={true}
-      width="100%"
-      height="100%"
       config={{
         file: {
           attributes: {

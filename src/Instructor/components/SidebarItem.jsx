@@ -15,6 +15,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { Typography } from "@mui/material";
+import SubSection from "./SubSection";
 
 function SidebarItem({ section, onShow }) {
   const [open, setOpen] = useState(false);
@@ -79,15 +80,11 @@ function SidebarItem({ section, onShow }) {
         <List component="div" disablePadding>
           {section.subsections.map((subsection) => {
             return (
-              <ListItemButton
-                sx={{ pl: 4 }}
+              <SubSection
+                subsection={subsection}
+                sectionId={section._id}
                 key={subsection._id}
-                onClick={() => onShow(subsection)}
-                className="group"
-              >
-                <ListItemText primary={subsection.title} />
-                <DeleteIcon className="text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible " />
-              </ListItemButton>
+              />
             );
           })}
         </List>
