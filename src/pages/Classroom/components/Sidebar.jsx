@@ -2,7 +2,7 @@ import SidebarItem from "./SidebarItem";
 
 import { Typography, Button, List } from "@mui/material";
 
-function Sidebar({ classroomData, onShow }) {
+function Sidebar({ classroomData, onShow, itemActive }) {
   return (
     <div className="mr-10  w-[400px] ">
       <Typography variant="h6" sx={{ marginBottom: "40px" }}>
@@ -19,6 +19,7 @@ function Sidebar({ classroomData, onShow }) {
               key={section._id}
               section={section}
               onShow={(data) => onShow(data)}
+              itemActive={itemActive}
             />
           );
         })}

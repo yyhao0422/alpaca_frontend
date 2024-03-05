@@ -11,7 +11,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Typography } from "@mui/material";
 
-function SidebarItem({ section, onShow }) {
+function SidebarItem({ section, onShow, itemActive }) {
   const [open, setOpen] = useState(false);
 
   function handleSectionClick() {
@@ -37,6 +37,7 @@ function SidebarItem({ section, onShow }) {
                 sx={{ pl: 4 }}
                 key={subsection._id}
                 onClick={() => onShow(subsection)}
+                selected={itemActive === subsection._id}
               >
                 <ListItemText primary={subsection.title} />
               </ListItemButton>

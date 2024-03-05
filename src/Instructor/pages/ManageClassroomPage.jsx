@@ -12,6 +12,7 @@ function ManageClassroomPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { id, sectionId, subSectionId } = useParams();
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     async function fetchClassroom() {
@@ -61,14 +62,13 @@ function ManageClassroomPage() {
   }, [classroomData, sectionId, subSectionId]);
 
   console.log(classroomData);
-  console.log("I am from Instrctor" + sectionId, subSectionId);
 
   return (
     <div className="mx-48 flex mt-5 ">
       {isLoading && <p>Loading...</p>}
       {!isLoading && Object.keys(classroomData).length !== 0 && (
         <>
-          <Sidebar classroomData={classroomData} />
+          <Sidebar />
           <div>
             {Object.keys(contentData).length === 0 ? (
               <p>Select a section</p>

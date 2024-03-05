@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+
+import axios from "axios";
+
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -13,24 +16,56 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-import { Typography } from "@mui/material";
+import DoneIcon from "@mui/icons-material/Done";
+import ClearIcon from "@mui/icons-material/Clear";
+import { TextField, Typography } from "@mui/material";
 import SubSection from "./SubSection";
 
-function SidebarItem({ section, onShow }) {
+function SidebarItem({ section, classroomId, reloadClassroomData }) {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreHorizIcon = Boolean(anchorEl);
+  const [error, setError] = useState("");
+
+  // Edit Title
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isSubmittingTitle, setIsSubmittingTitle] = useState(false);
+  const titleRef = useRef();
+
+  async function handleEditTitleSection() {
+    setIsSubmittingTitle(true);
+    const title = titleRef.current.value;
+
+    try {
+      const response = await axios.put(
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        { title }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error updating section title");
+      }
+    } catch (error) {
+      setError(error.message || "Error updating section title");
+    }
+
+    setIsEditingTitle(false);
+    setAnchorEl(null);
+    reloadClassroomData();
+  }
+
+  function handleCancelEditTitleSection() {
+    setIsEditingTitle(false);
+    setAnchorEl(null);
+  }
 
   function handleMoreHorizClick(event) {
     setAnchorEl(event.currentTarget);
   }
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   function handleSectionClick() {
     setOpen(!open);
+    setAnchorEl(null);
   }
 
   function handleAddSubsection() {
@@ -40,41 +75,65 @@ function SidebarItem({ section, onShow }) {
   return (
     <>
       <ListItemButton className="group">
-        <AddIcon
-          onClick={handleAddSubsection}
-          className="absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible right-12"
-        />
-        <MoreHorizIcon
-          className={`absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible  right-20`}
-          onClick={handleMoreHorizClick}
-        />
-        <Menu
-          anchorEl={anchorEl}
-          open={openMoreHorizIcon}
-          onClose={handleClose}
-        >
-          <MenuItem>
-            <EditIcon sx={{ marginRight: "5px" }} />
-            Edit Title
-          </MenuItem>
+        <>
+          {!isEditingTitle ? (
+            <>
+              <ListItemText
+                onClick={handleSectionClick}
+                disableTypography
+                primary={
+                  <Typography sx={{ fontWeight: "10px" }}>
+                    {section.title}
+                  </Typography>
+                }
+              />
+              <AddIcon
+                onClick={handleAddSubsection}
+                className="absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible right-12"
+              />
+              <MoreHorizIcon
+                className={`absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible  right-20`}
+                onClick={handleMoreHorizClick}
+              />
+              <Menu
+                anchorEl={anchorEl}
+                open={openMoreHorizIcon}
+                onClose={() => setAnchorEl(null)}
+              >
+                <MenuItem onClick={() => setIsEditingTitle(true)}>
+                  <EditIcon sx={{ marginRight: "5px" }} />
+                  Edit Title
+                </MenuItem>
 
-          <MenuItem>
-            <DeleteIcon sx={{ marginRight: "5px" }} />
-            Delete Classroom
-          </MenuItem>
-        </Menu>
-        <ListItemText
-          onClick={handleSectionClick}
-          disableTypography
-          primary={
-            <Typography sx={{ fontWeight: "10px" }}>{section.title}</Typography>
-          }
-        />
-        {open ? (
-          <ExpandLess onClick={handleSectionClick} />
-        ) : (
-          <ExpandMore onClick={handleSectionClick} />
-        )}
+                <MenuItem>
+                  <DeleteIcon sx={{ marginRight: "5px" }} />
+                  Delete Section
+                </MenuItem>
+              </Menu>
+              {open ? (
+                <ExpandLess onClick={handleSectionClick} />
+              ) : (
+                <ExpandMore onClick={handleSectionClick} />
+              )}
+            </>
+          ) : (
+            <div className="flex justify-between items-center">
+              <TextField
+                inputRef={titleRef}
+                defaultValue={section.title}
+                className="w-full"
+              />
+              <DoneIcon
+                className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3  "
+                onClick={handleEditTitleSection}
+              />
+              <ClearIcon
+                className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
+                onClick={handleCancelEditTitleSection}
+              />
+            </div>
+          )}
+        </>
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>

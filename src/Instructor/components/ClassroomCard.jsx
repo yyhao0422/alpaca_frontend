@@ -33,7 +33,7 @@ function ClassroomCard({ data }) {
             Manage Course
           </Typography>
         </div>
-        <div className="m-3 group-hover:blur-sm">
+        <div className="m-3 group-hover:blur-3xl">
           <Typography variant="h6">{data.title}</Typography>
           <Typography
             variant="subtitle1"

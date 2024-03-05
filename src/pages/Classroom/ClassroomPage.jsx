@@ -19,6 +19,7 @@ function ClassroomPage() {
       <Sidebar
         classroomData={classroomData}
         onShow={(data) => setContentData(data)}
+        itemActive={contentData._id || ""}
       />
       <div>
         {Object.keys(contentData).length === 0 ? (
