@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
@@ -35,10 +36,54 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreHorizIcon = Boolean(anchorEl);
   const [error, setError] = useState("");
-
-  // Delete Section
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isSubmittingTitle, setIsSubmittingTitle] = useState(false);
+  const titleRef = useRef();
   const [openDeleteSectionDialog, setOpenDeleteSectionDialog] = useState(false);
   const [isDeletingSection, setIsDeletingSection] = useState(false);
+  const subSectionTitleRef = useRef();
+  const [isAddingSubsection, setIsAddingSubsection] = useState(false);
+  const [isSubmittingSubsection, setIsSubmittingSubsection] = useState(false);
+  const navigate = useNavigate();
+
+  // Add Subsection
+
+  function handleAddSubsectionClick() {
+    setOpen(true);
+    setIsAddingSubsection(true);
+  }
+
+  function handleCancelAddSubsection() {
+    setIsAddingSubsection(false);
+  }
+
+  async function handleAddSubsection() {
+    setIsSubmittingSubsection(true);
+    const title = subSectionTitleRef.current.value;
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        { title }
+      );
+
+      navigate(
+        `/instructor/classroom/manage/${classroomId}/${section._id}/${response.data.data.subsection._id}`,
+        {
+          replace: true,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error adding subsection");
+      }
+    } catch (error) {
+      setError(error.message || "Error adding subsection");
+    }
+    setIsAddingSubsection(false);
+    reloadClassroomData();
+  }
+
+  // Delete Section
 
   async function handleDeleteSection() {
     setIsDeletingSection(true);
@@ -63,9 +108,7 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
   }
 
   // Edit Title
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [isSubmittingTitle, setIsSubmittingTitle] = useState(false);
-  const titleRef = useRef();
+
   async function handleEditTitleSection() {
     setIsSubmittingTitle(true);
     const title = titleRef.current.value;
@@ -99,11 +142,8 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
 
   function handleSectionClick() {
     setOpen(!open);
+    setIsAddingSubsection(false);
     setAnchorEl(null);
-  }
-
-  function handleAddSubsection() {
-    console.log("Add button clicked");
   }
 
   return (
@@ -122,7 +162,7 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
                 }
               />
               <AddIcon
-                onClick={handleAddSubsection}
+                onClick={handleAddSubsectionClick}
                 className="absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible right-12"
               />
               <MoreHorizIcon
@@ -156,6 +196,11 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
                 inputRef={titleRef}
                 defaultValue={section.title}
                 className="w-full"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleEditTitleSection();
+                  }
+                }}
               />
               <DoneIcon
                 className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3  "
@@ -177,9 +222,31 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
                 subsection={subsection}
                 sectionId={section._id}
                 key={subsection._id}
+                reloadClassroomData={() => reloadClassroomData()}
               />
             );
           })}
+          {isAddingSubsection && (
+            <div className="flex justify-between items-center">
+              <TextField
+                inputRef={subSectionTitleRef}
+                className="w-full"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddSubsection();
+                  }
+                }}
+              />
+              <DoneIcon
+                className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3  "
+                onClick={handleAddSubsection}
+              />
+              <ClearIcon
+                className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
+                onClick={handleCancelAddSubsection}
+              />
+            </div>
+          )}
         </List>
       </Collapse>
       <>
