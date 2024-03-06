@@ -53,7 +53,7 @@ function ManageClassroomPage() {
         );
 
         if (!subSection) {
-          throw new Error("Subsection not found!");
+          setContentData({});
         } else {
           setContentData(subSection);
         }
