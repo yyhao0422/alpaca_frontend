@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import axios from "axios";
 
@@ -45,6 +45,16 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
   const [isAddingSubsection, setIsAddingSubsection] = useState(false);
   const [isSubmittingSubsection, setIsSubmittingSubsection] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const parts = location.pathname.split("/");
+  const sectionId = parts[5];
+
+  useEffect(() => {
+    if (sectionId === section._id) {
+      setOpen(true);
+    }
+  }, [sectionId, section]);
 
   // Add Subsection
 

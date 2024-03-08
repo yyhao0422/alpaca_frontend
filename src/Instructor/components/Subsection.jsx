@@ -32,7 +32,7 @@ function SubSection({ subsection, sectionId, reloadClassroomData }) {
   const newPath = parts.join("/");
 
   function handleSubSectionClick() {
-    navigate(newPath, { shallow: true });
+    navigate(newPath, { replace: true });
   }
 
   function handleDeleteSubsectionClick() {
