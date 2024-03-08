@@ -1,7 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSortable } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+
+import { arrayMove } from "@dnd-kit/sortable";
 
 import axios from "axios";
 
@@ -33,6 +40,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import ClearIcon from "@mui/icons-material/Clear";
 
 import SubSection from "./SubSection";
+import { DndContext, closestCenter } from "@dnd-kit/core";
 
 function Section({ id, section, classroomId, reloadClassroomData }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -54,6 +62,11 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
 
   const parts = location.pathname.split("/");
   const sectionId = parts[5];
+
+  const sortedSubsections = section.subsections.sort((a, b) =>
+    a.order > b.order ? 1 : b.order > a.order ? -1 : 0
+  );
+  const [subsections, setSubsections] = useState(sortedSubsections);
 
   useEffect(() => {
     if (sectionId === section._id) {
@@ -166,12 +179,65 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
     transition,
   };
 
+  function getSubsectionPostion(ids) {
+    return subsections.findIndex((subsection) => subsection.id === ids);
+  }
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    if (active.id === over.id) {
+      return;
+    }
+
+    setSubsections((prev) => {
+      const originalPos = getSubsectionPostion(active.id);
+      const newPos = getSubsectionPostion(over.id);
+      const reorderedSubsections = arrayMove(prev, originalPos, newPos);
+      // Assign the index as the new order for each section
+      const subSectionsWithNewOrder = reorderedSubsections.map(
+        (subsection, index) => {
+          return { ...subsection, order: index + 1 };
+        }
+      );
+      // Update each section in the database
+      subSectionsWithNewOrder.forEach(async (subsection) => {
+        try {
+          await axios.put(
+            `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}/${subsection._id}`,
+            {
+              order: subsection.order,
+            },
+            {
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        } catch (err) {
+          setError(
+            err.message || "An error occurred while updating section order"
+          );
+        }
+      });
+
+      return subSectionsWithNewOrder;
+    });
+  }
+  console.log(subsections);
+
   return (
     <div>
-      <ListItem className="group cursor-pointer hover:bg-blue-200">
+      <ListItem
+        ref={setNodeRef}
+        {...attributes}
+        style={style}
+        className="group cursor-pointer hover:bg-blue-200"
+      >
         <>
           {!isEditingTitle ? (
             <>
+              <DragIndicatorIcon
+                {...listeners}
+                className="text-gray-500 mr-4"
+              />
               <ListItemText
                 onClick={handleSectionClick}
                 disableTypography
@@ -236,16 +302,27 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {section.subsections.map((subsection) => {
-            return (
-              <SubSection
-                subsection={subsection}
-                sectionId={section._id}
-                key={subsection._id}
-                reloadClassroomData={() => reloadClassroomData()}
-              />
-            );
-          })}
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={subsections}
+              strategy={verticalListSortingStrategy}
+            >
+              {subsections.map((subsection) => {
+                return (
+                  <SubSection
+                    id={subsection.id}
+                    subsection={subsection}
+                    sectionId={section._id}
+                    key={subsection._id}
+                    reloadClassroomData={() => reloadClassroomData()}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
           {isAddingSubsection && (
             <div className="flex justify-between items-center">
               <TextField

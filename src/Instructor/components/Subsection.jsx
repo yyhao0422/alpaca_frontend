@@ -4,6 +4,7 @@ import axios from "axios";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
 import {
   Dialog,
   DialogActions,
@@ -15,7 +16,16 @@ import {
 
 import { useLocation, useNavigate } from "react-router-dom";
 
-function SubSection({ subsection, sectionId, reloadClassroomData }) {
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
   const [openDeleteSectionDialog, setOpenDeleteSectionDialog] = useState(false);
   const [isDeletingSection, setIsDeletingSection] = useState(false);
   const [error, setError] = useState("");
@@ -38,6 +48,11 @@ function SubSection({ subsection, sectionId, reloadClassroomData }) {
   function handleDeleteSubsectionClick() {
     setOpenDeleteSectionDialog(true);
   }
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   async function handleDeleteSubSection() {
     setIsDeletingSection(true);
@@ -65,17 +80,25 @@ function SubSection({ subsection, sectionId, reloadClassroomData }) {
   return (
     <>
       <ListItemButton
+        ref={setNodeRef}
+        {...attributes}
+        style={style}
         selected={currentPath === newPath}
         sx={{ pl: 4 }}
         className="group"
         onClick={handleSubSectionClick}
       >
+        <DragHandleIcon
+          {...listeners}
+          className="text-gray-500 cursor-grab mr-4"
+        />
         <ListItemText primary={subsection.title} />
         <DeleteIcon
           className="text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible "
           onClick={handleDeleteSubsectionClick}
         />
       </ListItemButton>
+
       <>
         <Dialog
           open={openDeleteSectionDialog}

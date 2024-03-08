@@ -1,8 +1,7 @@
-import { useState, createElement, useRef, useEffect } from "react";
+import { useState, createElement, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-import Section from "./Section";
 import {
   Typography,
   Button,
@@ -23,16 +22,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import UploadIcon from "@mui/icons-material/Upload";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import ClearIcon from "@mui/icons-material/Clear";
-import { DndContext, closestCenter, closestCorners } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+
+import Columns from "./Columns";
 
 function Sidebar() {
+  // [1]
   const navigator = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -41,6 +37,10 @@ function Sidebar() {
   const [isLoading, setIsLoading] = useState(false);
   const [classroomData, setClassroomData] = useState({});
   const [reload, setReload] = useState(false);
+  const [openDeleteClassroomDialog, setOpenDeleteClassroomDialog] =
+    useState(false);
+  const [isLoadingDeleteClassroom, setIsLoadingDeleteClassroom] =
+    useState(false);
 
   useEffect(() => {
     async function fetchClassroom() {
@@ -81,66 +81,10 @@ function Sidebar() {
   const [image, setImage] = useState(null); //
   const [isLoadingUploadImage, setIsLoadingUploadImage] = useState(false);
 
-  // Delete Classroom State
-  const [openDeleteClassroomDialog, setOpenDeleteClassroomDialog] =
-    useState(false);
-  const [isLoadingDeleteClassroom, setIsLoadingDeleteClassroom] =
-    useState(false);
-
-  // Add Section State
-  const [isAddingSection, setIsAddingSection] = useState(false);
-  const [isLoadingAddSection, setIsLoadingAddSection] = useState(false);
-  const sectionTitleRef = useRef();
-
   useEffect(() => {
     setTitle(classroomData.title);
     setDescription(classroomData.description);
   }, [classroomData]);
-
-  async function handleAddSection() {
-    setIsLoadingAddSection(true);
-    try {
-      const res = await axios.post(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
-        {
-          title: sectionTitleRef.current.value,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(
-          data.message || "An error occurred while adding section"
-        );
-      }
-    } catch (err) {
-      setError(err.message || "An error occurred while adding section");
-    }
-    setIsLoadingAddSection(false);
-    setIsAddingSection(false);
-    setReload((prev) => !prev);
-  }
-
-  function AddSection() {
-    return (
-      <div className="w-full flex justify-between items-center">
-        <TextField
-          type="text"
-          inputRef={sectionTitleRef}
-          className="w-full  resize-none"
-          color="primary"
-        />
-        <DoneIcon
-          className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3  "
-          onClick={handleAddSection}
-        />
-        <ClearIcon
-          className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
-          onClick={() => setIsAddingSection(false)}
-        />
-      </div>
-    );
-  }
 
   async function handleDeleteClassroom() {
     setIsLoadingDeleteClassroom(true);
@@ -354,38 +298,7 @@ function Sidebar() {
             )}
           </div>
 
-          <List
-            sx={{ width: 360 }}
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-          >
-            <DndContext collisionDetection={closestCorners}>
-              <SortableContext
-                items={classroomData.sections}
-                strategy={verticalListSortingStrategy}
-              >
-                {classroomData.sections.map((section) => {
-                  return (
-                    <Section
-                      id={section._id}
-                      key={section._id}
-                      section={section}
-                      classroomId={classroomData._id}
-                      reloadClassroomData={() => setReload((prev) => !prev)}
-                    />
-                  );
-                })}
-              </SortableContext>
-            </DndContext>
-            {isAddingSection && <AddSection />}
-            <div
-              className="text-center cursor-pointer mt-5 text-gray-400 hover:text-gray-800"
-              onClick={() => setIsAddingSection(true)}
-            >
-              <AddCircleOutlineIcon sx={{ marginRight: "5px" }} />
-              Add Section
-            </div>
-          </List>
+          <Columns id={classroomData.id} />
         </>
       )}
 
