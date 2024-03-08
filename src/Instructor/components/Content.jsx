@@ -65,7 +65,12 @@ function Content() {
             <TextContent data={subSection} />
           )
         ) : (
-          <NewContent refresh={() => setRefresh((prev) => !prev)} />
+          <NewContent
+            classroomId={id}
+            sectionId={sectionId}
+            subSectionId={subSectionId}
+            refresh={() => setRefresh((prev) => !prev)}
+          />
         )
       ) : (
         <p>Select a section</p>

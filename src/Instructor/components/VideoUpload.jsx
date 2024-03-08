@@ -1,27 +1,15 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Button, Typography } from "@mui/material";
-import ReactPlayer from "react-player";
+import { Button } from "@mui/material";
 import VideoUploadProgress from "./VideoUploadProgress";
 import axios from "axios";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-function VideoUpload({ refresh }) {
+function VideoUpload({ refresh, classroomId, sectionId, subSectionId }) {
   const [file, setFile] = useState({});
   const [uploadedFile, setUploadedFile] = useState({});
   const [showProgress, setShowProgress] = useState(false);
   const [error, setError] = useState("");
-
-  const location = useLocation();
-
-  const currentPath = location.pathname;
-
-  const parts = currentPath.split("/");
-
-  const classroomId = parts[4];
-  const sectionId = parts[5];
-  const subsectionId = parts[6];
 
   async function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -38,7 +26,7 @@ function VideoUpload({ refresh }) {
     setShowProgress(true);
     try {
       const response = await axios.put(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subsectionId}?type=video`,
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=video`,
         formData,
         {
           onUploadProgress: ({ loaded, total }) => {

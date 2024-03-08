@@ -8,17 +8,13 @@ import {
   Button,
 } from "@mui/material";
 import VideoUpload from "./VideoUpload";
-import SendIcon from "@mui/icons-material/Send";
+import TextUpload from "./TextUpload";
 
-function NewContent({ refresh }) {
+function NewContent({ classroomId, sectionId, subSectionId, refresh }) {
   const [contentType, setContentType] = useState("");
-  const [uploadContent, setUploadContent] = useState(null);
 
   function handleChange(event) {
     setContentType(event.target.value);
-  }
-  if (uploadContent) {
-    console.log("Content uploaded");
   }
 
   return (
@@ -44,15 +40,24 @@ function NewContent({ refresh }) {
               <MenuItem value={"text"}>Text</MenuItem>
             </Select>
           </FormControl>
-          {uploadContent && (
-            <Button variant="contained" endIcon={<SendIcon />}>
-              Send
-            </Button>
-          )}
         </div>
       </div>
-      {contentType === "video" && <VideoUpload refresh={() => refresh()} />}
-      {contentType === "text" && <div>Text</div>}
+      {contentType === "video" && (
+        <VideoUpload
+          classroomId={classroomId}
+          sectionId={sectionId}
+          subSectionId={subSectionId}
+          refresh={() => refresh()}
+        />
+      )}
+      {contentType === "text" && (
+        <TextUpload
+          classroomId={classroomId}
+          sectionId={sectionId}
+          subSectionId={subSectionId}
+          refresh={() => refresh()}
+        />
+      )}
     </>
   );
 }
