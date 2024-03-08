@@ -59,6 +59,18 @@ function TopNavigationBar() {
         >
           About
         </NavLink>
+        <NavLink
+          to="/instructor"
+          className={({ isActive, isPending }) =>
+            isPending
+              ? "m-2 mb-4"
+              : isActive
+              ? "m-2 mb-4 underline underline-offset-[10px]"
+              : "m-2 mb-4"
+          }
+        >
+          Instructor
+        </NavLink>
       </div>
     </div>
   );
