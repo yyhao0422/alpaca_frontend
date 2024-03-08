@@ -2,7 +2,7 @@ import { useState, createElement, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-import SidebarItem from "./SidebarItem";
+import Section from "./Section";
 import {
   Typography,
   Button,
@@ -26,6 +26,11 @@ import UploadIcon from "@mui/icons-material/Upload";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ClearIcon from "@mui/icons-material/Clear";
+import { DndContext, closestCenter, closestCorners } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 function Sidebar() {
   const navigator = useNavigate();
@@ -354,16 +359,24 @@ function Sidebar() {
             component="nav"
             aria-labelledby="nested-list-subheader"
           >
-            {classroomData.sections.map((section) => {
-              return (
-                <SidebarItem
-                  key={section._id}
-                  section={section}
-                  classroomId={classroomData._id}
-                  reloadClassroomData={() => setReload((prev) => !prev)}
-                />
-              );
-            })}
+            <DndContext collisionDetection={closestCorners}>
+              <SortableContext
+                items={classroomData.sections}
+                strategy={verticalListSortingStrategy}
+              >
+                {classroomData.sections.map((section) => {
+                  return (
+                    <Section
+                      id={section._id}
+                      key={section._id}
+                      section={section}
+                      classroomId={classroomData._id}
+                      reloadClassroomData={() => setReload((prev) => !prev)}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
             {isAddingSection && <AddSection />}
             <div
               className="text-center cursor-pointer mt-5 text-gray-400 hover:text-gray-800"

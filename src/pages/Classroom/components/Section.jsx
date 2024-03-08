@@ -11,7 +11,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Typography } from "@mui/material";
 
-function SidebarItem({ section, onShow, itemActive }) {
+function Section({ section, onShow, itemActive }) {
   const [open, setOpen] = useState(false);
 
   function handleSectionClick() {
@@ -49,4 +49,4 @@ function SidebarItem({ section, onShow, itemActive }) {
   );
 }
 
-export default SidebarItem;
+export default Section;

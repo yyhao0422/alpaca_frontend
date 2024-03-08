@@ -1,4 +1,4 @@
-import SidebarItem from "./SidebarItem";
+import Section from "./Section";
 
 import { Typography, Button, List } from "@mui/material";
 
@@ -15,7 +15,7 @@ function Sidebar({ classroomData, onShow, itemActive }) {
       >
         {classroomData.sections.map((section) => {
           return (
-            <SidebarItem
+            <Section
               key={section._id}
               section={section}
               onShow={(data) => onShow(data)}

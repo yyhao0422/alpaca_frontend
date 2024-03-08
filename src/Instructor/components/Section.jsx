@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import axios from "axios";
 
@@ -16,6 +18,7 @@ import {
   List,
   ListItemText,
   Collapse,
+  ListItem,
 } from "@mui/material";
 
 import ExpandLess from "@mui/icons-material/ExpandLess";
@@ -31,7 +34,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 
 import SubSection from "./SubSection";
 
-function SidebarItem({ section, classroomId, reloadClassroomData }) {
+function Section({ id, section, classroomId, reloadClassroomData }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreHorizIcon = Boolean(anchorEl);
@@ -156,9 +161,14 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
     setAnchorEl(null);
   }
 
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
-    <>
-      <ListItemButton className="group">
+    <div>
+      <ListItem className="group cursor-pointer hover:bg-blue-200">
         <>
           {!isEditingTitle ? (
             <>
@@ -223,7 +233,7 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
             </div>
           )}
         </>
-      </ListItemButton>
+      </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {section.subsections.map((subsection) => {
@@ -285,8 +295,8 @@ function SidebarItem({ section, classroomId, reloadClassroomData }) {
           </DialogActions>
         </Dialog>
       </>
-    </>
+    </div>
   );
 }
 
-export default SidebarItem;
+export default Section;
