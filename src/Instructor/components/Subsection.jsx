@@ -72,9 +72,11 @@ function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
       }
     } catch (error) {
       setError(error.message || "Error deleting subsection");
+    } finally {
+      setIsDeletingSection(false);
+      setOpenDeleteSectionDialog(false);
+      reloadClassroomData();
     }
-    setIsDeletingSection(false);
-    reloadClassroomData();
   }
 
   return (
@@ -96,6 +98,11 @@ function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
         <DeleteIcon
           className="text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible "
           onClick={handleDeleteSubsectionClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleDeleteSubsectionClick();
+            }
+          }}
         />
       </ListItemButton>
 

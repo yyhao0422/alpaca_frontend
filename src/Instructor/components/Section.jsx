@@ -69,6 +69,10 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
   const [subsections, setSubsections] = useState(sortedSubsections);
 
   useEffect(() => {
+    setSubsections(sortedSubsections);
+  }, [sectionId, section]);
+
+  useEffect(() => {
     if (sectionId === section._id) {
       setOpen(true);
     }

@@ -150,6 +150,7 @@ function Sidebar() {
     }
     setIsLoadingUploadImage(false);
     setOpenImageDialog(false);
+    setAnchorEl(null);
     setReload((prev) => !prev);
   }
   function handleEditTitleClick() {
@@ -241,6 +242,11 @@ function Sidebar() {
                 <DoneIcon
                   className=" translate-y-1 cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
                   onClick={handleEditTitleConfirm}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleEditTitleConfirm();
+                    }
+                  }}
                 />
               </div>
             )}
@@ -293,6 +299,11 @@ function Sidebar() {
                 <DoneIcon
                   className=" translate-y-1 cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
                   onClick={handleEditDescriptionConfirm}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleEditDescriptionConfirm();
+                    }
+                  }}
                 />
               </div>
             )}
