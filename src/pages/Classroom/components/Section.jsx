@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -13,6 +14,13 @@ import { Typography } from "@mui/material";
 
 function Section({ section, onShow, itemActive }) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const subsection = JSON.parse(localStorage.getItem("subsection"));
+    if (subsection && subsection.sectionId === section._id) {
+      setOpen(true);
+    }
+  }, [section._id]);
 
   function handleSectionClick() {
     setOpen(!open);
@@ -36,7 +44,13 @@ function Section({ section, onShow, itemActive }) {
               <ListItemButton
                 sx={{ pl: 4 }}
                 key={subsection._id}
-                onClick={() => onShow(subsection)}
+                onClick={() => {
+                  localStorage.setItem(
+                    "subsection",
+                    JSON.stringify({ ...subsection, sectionId: section._id })
+                  );
+                  onShow(subsection);
+                }}
                 selected={itemActive === subsection._id}
               >
                 <ListItemText primary={subsection.title} />

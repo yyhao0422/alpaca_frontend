@@ -225,7 +225,6 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
       return subSectionsWithNewOrder;
     });
   }
-  console.log(subsections);
 
   return (
     <div>

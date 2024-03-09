@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
@@ -7,12 +7,19 @@ import TextContent from "./components/TextContent";
 
 function ClassroomPage() {
   const [contentData, setContentData] = useState({});
+
+  useEffect(() => {
+    const subsection = JSON.parse(localStorage.getItem("subsection"));
+    if (subsection) {
+      setContentData(subsection);
+    }
+  }, []);
+
   const { id } = useParams();
   let location = useLocation();
 
   const classroomData = location.state.classroomData;
-  console.log(contentData);
-  console.log(Object.keys(contentData).length);
+  console.log(classroomData);
 
   return (
     <div className="mx-48 flex mt-5 ">
@@ -24,15 +31,19 @@ function ClassroomPage() {
       <div>
         {Object.keys(contentData).length === 0 ? (
           <p>Select a section</p>
-        ) : contentData.contentType === "video" ? (
-          <VideoContent videoUrl={contentData.contentURL} />
+        ) : contentData.contentType ? (
+          contentData.contentType === "video" ? (
+            <VideoContent contentData={contentData} />
+          ) : (
+            <TextContent
+              data={{
+                title: contentData.contentTitle,
+                description: contentData.contentDescription,
+              }}
+            />
+          )
         ) : (
-          <TextContent
-            data={{
-              title: contentData.contentTitle,
-              description: contentData.contentDescription,
-            }}
-          />
+          <p>作者还未添加任何内容哦</p>
         )}
       </div>
     </div>
