@@ -5,7 +5,9 @@ function VideoContent({ contentData }) {
   const playerRef = useRef(null);
   const [isReady, setIsReady] = useState(false);
 
-  const previosPlayTime = JSON.parse(localStorage.getItem("playTime")).playTime;
+  const previosPlayTime = JSON.parse(
+    localStorage.getItem("playTime")
+  )?.playTime;
 
   const [currPlayTime, setCurrPlayTime] = useState();
 
