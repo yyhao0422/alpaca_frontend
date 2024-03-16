@@ -29,7 +29,9 @@ function Columns({ id }) {
       setIsLoading(true);
       try {
         const response = await fetch(
-          "http://127.0.0.1:3000/api/v1/classrooms/" + id + "?populate=sections"
+          " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/" +
+            id +
+            "?populate=sections"
         );
         const data = await response.json();
         if (!response.ok) {
@@ -55,7 +57,7 @@ function Columns({ id }) {
     setIsLoadingAddSection(true);
     try {
       const res = await axios.post(
-        `http://127.0.0.1:3000/api/v1/classrooms/${id}`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${id}`,
         {
           title: sectionTitleRef.current.value,
         },
@@ -118,7 +120,7 @@ function Columns({ id }) {
       sectionsWithNewOrder.forEach(async (section) => {
         try {
           await axios.put(
-            `http://127.0.0.1:3000/api/v1/classrooms/${id}/${section._id}`,
+            ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${id}/${section._id}`,
             {
               order: section.order,
             },

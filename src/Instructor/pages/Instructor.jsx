@@ -13,7 +13,9 @@ function Instructor() {
     async function fetchClassrooms() {
       setIsLoading(true);
       try {
-        const response = await fetch("http://127.0.0.1:3000/api/v1/classrooms");
+        const response = await fetch(
+          " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms"
+        );
         const data = await response.json();
         if (!response.ok) {
           throw new Error("An error occurred while fetching classrooms!");

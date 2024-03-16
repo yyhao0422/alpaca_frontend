@@ -19,7 +19,10 @@ function ClassroomCard({ data }) {
       className=" mt-10 w-fill flex cursor-pointer group"
     >
       <Card sx={{ width: "100%", height: "100px", display: "flex" }}>
-        <img src={data.imageURL} alt="classroom pictures" />
+        <img
+          src={`https://alpaca-learning-bucket.s3.ap-southeast-1.amazonaws.com/${data._id}`}
+          alt="classroom pictures"
+        />
         <div className="absolute mt-9 mx-[500px] invisible group-hover:visible">
           <Typography
             variant="h6"

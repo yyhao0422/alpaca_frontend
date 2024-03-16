@@ -58,7 +58,7 @@ function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
     setIsDeletingSection(true);
     try {
       const response = await axios.delete(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subsection._id}`
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${sectionId}/${subsection._id}`
       );
 
       if (response.status === 204) {

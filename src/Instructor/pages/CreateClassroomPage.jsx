@@ -25,38 +25,82 @@ function CreateClassroomPage() {
       transition.retry();
     }
   }, []);
-  console.log(blocker);
+
+  async function handlePostClassroom(title, description) {
+    try {
+      const resCreateClassroom = await axios.post(
+        " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms",
+        {
+          title,
+          description,
+        }
+      );
+
+      const data = resCreateClassroom.data.data;
+      return data;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async function handleUploadImage(file, key) {
+    try {
+      console.log("start uploading image");
+      console.log(file);
+      console.log(key);
+
+      const resUploadImage = await fetch(
+        `https://sujmw6qeyf.execute-api.ap-southeast-1.amazonaws.com/dev/uploads/alpaca-learning-bucket/${key}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "image/jpeg",
+          },
+          body: file,
+        }
+      );
+
+      const data = await resUploadImage.json();
+      return data;
+    } catch (error) {
+      return error;
+    }
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
 
     setIsLoading(true);
+    console.log("submitting");
 
-    const formData = new FormData();
-    formData.append("title", event.target[0].value);
-    formData.append("description", event.target[2].value);
-    formData.append("classroomImage", file);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:3000/api/v1/classrooms",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+      const dataPostClassroom = await handlePostClassroom(
+        event.target[0].value,
+        event.target[2].value
       );
-      if (!response.ok) {
-        throw new Error(
-          "An error occurred while creating classroom! Please try again."
-        );
+      console.log("dataPostClassroom", dataPostClassroom.classroom);
+      console.log(dataPostClassroom.classroom.id);
+      if (dataPostClassroom instanceof Error) {
+        throw dataPostClassroom;
       }
-      window.location.href = "/instructor";
-      blocker.proceed();
+
+      const dataUploadImage = await handleUploadImage(
+        file,
+        dataPostClassroom.classroom.id
+      );
+      if (dataUploadImage instanceof Error) {
+        throw dataUploadImage;
+      }
+
+      // window.location.href = "/instructor";
+      // blocker.proceed();
     } catch (error) {
+      console.log("error", error);
       setError(
         error || "An error occurred while creating classroom! Please try again."
       );
-      window.location.href = "/instructor";
-      blocker.proceed();
+      // window.location.href = "/instructor";
+      // blocker.proceed();
     }
     setIsLoading(false);
   }

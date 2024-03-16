@@ -26,7 +26,7 @@ function VideoUpload({ refresh, classroomId, sectionId, subSectionId }) {
     setShowProgress(true);
     try {
       const response = await axios.put(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=video`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=video`,
         formData,
         {
           onUploadProgress: ({ loaded, total }) => {

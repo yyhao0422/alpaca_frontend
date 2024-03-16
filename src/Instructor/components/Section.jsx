@@ -94,7 +94,7 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
     const title = subSectionTitleRef.current.value;
     try {
       const response = await axios.post(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}`,
         { title }
       );
 
@@ -121,7 +121,7 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
     setIsDeletingSection(true);
     try {
       const response = await axios.delete(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}`
       );
       if (!response.ok) {
         throw new Error("Error updating section title");
@@ -147,7 +147,7 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
 
     try {
       const response = await axios.put(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}`,
         { title }
       );
 
@@ -207,7 +207,7 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
       subSectionsWithNewOrder.forEach(async (subsection) => {
         try {
           await axios.put(
-            `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}/${subsection._id}`,
+            ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}/${subsection._id}`,
             {
               order: subsection.order,
             },

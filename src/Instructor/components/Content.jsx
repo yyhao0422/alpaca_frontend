@@ -20,7 +20,8 @@ function Content() {
       setIsLoading(true);
       try {
         const response = await fetch(
-          "http://127.0.0.1:3000/api/v1/classrooms/" + id
+          " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/" +
+            id
         );
         const data = await response.json();
         if (!response.ok) {

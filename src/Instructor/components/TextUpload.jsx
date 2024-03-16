@@ -18,7 +18,7 @@ function TextUpload({ classroomId, sectionId, subSectionId, refresh }) {
     };
     try {
       const res = await axios.put(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=text`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=text`,
         data
       );
       if (res.status !== 200) {

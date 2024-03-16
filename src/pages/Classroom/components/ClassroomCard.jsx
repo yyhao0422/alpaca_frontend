@@ -20,7 +20,7 @@ function ClassroomCard({ data }) {
         <div className="flex flex-col">
           <img
             className="w-[350px]"
-            src={data.imageURL}
+            src={`https://alpaca-learning-bucket.s3.ap-southeast-1.amazonaws.com/${data._id}`}
             alt="classroom pictures"
           />
           <Typography sx={{ padding: "20px" }} variant="h6">

@@ -47,7 +47,8 @@ function Sidebar() {
       setIsLoading(true);
       try {
         const response = await fetch(
-          "http://127.0.0.1:3000/api/v1/classrooms/" + id
+          " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/" +
+            id
         );
         const data = await response.json();
         if (!response.ok) {
@@ -90,7 +91,7 @@ function Sidebar() {
     setIsLoadingDeleteClassroom(true);
     try {
       const res = await axios.delete(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`
       );
       const data = await res.json();
       if (!res.ok) {
@@ -131,7 +132,7 @@ function Sidebar() {
     formData.append("classroomImage", file);
     try {
       const res = await axios.put(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -160,7 +161,7 @@ function Sidebar() {
   async function handleEditTitleConfirm() {
     try {
       const res = await fetch(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`,
         {
           method: "PUT",
           headers: {
@@ -192,7 +193,7 @@ function Sidebar() {
   async function handleEditDescriptionConfirm() {
     try {
       const res = await fetch(
-        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
+        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`,
         {
           method: "PUT",
           headers: {
