@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import TopNavigationBar from "./Navigation Bar/topNavigationBar";
+import TopNavigationBar from "./NavigationBar/TopNavigationBar";
 import DesktopWrapper from "./Wrapper/DesktopWrapper";
 
 function WebLayout() {
