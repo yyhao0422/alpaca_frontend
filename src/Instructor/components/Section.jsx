@@ -39,7 +39,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import SubSection from "./SubSection";
+import SubSection from "./Subsection";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 
 function Section({ id, section, classroomId, reloadClassroomData }) {
