@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 
 import { Button, Card } from "@mui/material";
@@ -6,6 +7,7 @@ import { Button, Card } from "@mui/material";
 function TextUpload({ classroomId, sectionId, subSectionId, refresh }) {
   const title = useRef();
   const description = useRef();
+  const { getToken } = useAuth();
 
   const [error, setError] = useState("");
 
@@ -16,10 +18,17 @@ function TextUpload({ classroomId, sectionId, subSectionId, refresh }) {
       contentDescription: description.current.value,
       contentType: "text",
     };
+    const token = await getToken();
     try {
       const res = await axios.put(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=text`,
-        data
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subSectionId}?type=text`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
       );
       if (res.status !== 200) {
         throw new Error("Failed to create content");

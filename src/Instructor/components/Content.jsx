@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
 
 import VideoContent from "../components/VideoContent";
 import TextContent from "../components/TextContent";
@@ -13,15 +14,22 @@ function Content() {
   const [error, setError] = useState("");
   const { id, sectionId, subSectionId } = useParams();
   const [refresh, setRefresh] = useState(false);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     async function fetchClassroom() {
-      console.log("refresh");
       setIsLoading(true);
+      const token = await getToken();
       try {
         const response = await fetch(
-          " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/" +
-            id
+          "http://127.0.0.1:3000/api/v1/classrooms/" + id,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+          }
         );
         const data = await response.json();
         if (!response.ok) {
@@ -60,7 +68,9 @@ function Content() {
         subSection.contentType ? (
           subSection.contentType === "video" ? (
             <Card>
-              <VideoContent videoUrl={subSection.contentURL} />
+              <VideoContent
+                videoUrl={`https://alpaca-learning-bucket.s3.ap-southeast-1.amazonaws.com/${subSection._id}`}
+              />
             </Card>
           ) : (
             <TextContent data={subSection} />

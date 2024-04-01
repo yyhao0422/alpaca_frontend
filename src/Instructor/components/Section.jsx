@@ -1,15 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-
-import { arrayMove } from "@dnd-kit/sortable";
-
+import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 
 import {
@@ -21,13 +12,12 @@ import {
   DialogActions,
   DialogContentText,
   Button,
-  ListItemButton,
   List,
   ListItemText,
   Collapse,
   ListItem,
 } from "@mui/material";
-
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
@@ -38,9 +28,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
 import ClearIcon from "@mui/icons-material/Clear";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { arrayMove } from "@dnd-kit/sortable";
+import { DndContext, closestCenter } from "@dnd-kit/core";
 
 import SubSection from "./Subsection";
-import { DndContext, closestCenter } from "@dnd-kit/core";
 
 function Section({ id, section, classroomId, reloadClassroomData }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -59,19 +56,23 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
   const [isSubmittingSubsection, setIsSubmittingSubsection] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { getToken } = useAuth();
 
-  const parts = location.pathname.split("/");
-  const sectionId = parts[5];
+  // Get the section id from the url
+  const sectionId = location.pathname.split("/")[5];
 
+  // Sort subsections by order
   const sortedSubsections = section.subsections.sort((a, b) =>
     a.order > b.order ? 1 : b.order > a.order ? -1 : 0
   );
   const [subsections, setSubsections] = useState(sortedSubsections);
 
+  // Update sorted subsections when the section changes
   useEffect(() => {
     setSubsections(sortedSubsections);
   }, [sectionId, section]);
 
+  // Open the active section
   useEffect(() => {
     if (sectionId === section._id) {
       setOpen(true);
@@ -79,23 +80,20 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
   }, [sectionId, section]);
 
   // Add Subsection
-
-  function handleAddSubsectionClick() {
-    setOpen(true);
-    setIsAddingSubsection(true);
-  }
-
-  function handleCancelAddSubsection() {
-    setIsAddingSubsection(false);
-  }
-
   async function handleAddSubsection() {
     setIsSubmittingSubsection(true);
+    const token = await getToken();
     const title = subSectionTitleRef.current.value;
     try {
       const response = await axios.post(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}`,
-        { title }
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        { title },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
       );
 
       navigate(
@@ -116,12 +114,18 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
   }
 
   // Delete Section
-
   async function handleDeleteSection() {
     setIsDeletingSection(true);
+    const token = await getToken();
     try {
       const response = await axios.delete(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}`
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
       );
       if (!response.ok) {
         throw new Error("Error updating section title");
@@ -134,21 +138,21 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
     reloadClassroomData();
   }
 
-  function handleDeleteSectionClick() {
-    setAnchorEl(null);
-    setOpenDeleteSectionDialog(true);
-  }
-
-  // Edit Title
-
+  // Edit Title Section
   async function handleEditTitleSection() {
     setIsSubmittingTitle(true);
+    const token = await getToken();
     const title = titleRef.current.value;
-
     try {
       const response = await axios.put(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}`,
-        { title }
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}`,
+        { title },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -163,30 +167,20 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
     reloadClassroomData();
   }
 
-  function handleCancelEditTitleSection() {
-    setIsEditingTitle(false);
-    setAnchorEl(null);
-  }
-
-  function handleMoreHorizClick(event) {
-    setAnchorEl(event.currentTarget);
-  }
-
   function handleSectionClick() {
     setOpen(!open);
     setIsAddingSubsection(false);
     setAnchorEl(null);
   }
 
+  // Drag and Drop
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
   function getSubsectionPostion(ids) {
     return subsections.findIndex((subsection) => subsection.id === ids);
   }
-
   function handleDragEnd(event) {
     const { active, over } = event;
     if (active.id === over.id) {
@@ -203,16 +197,21 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
           return { ...subsection, order: index + 1 };
         }
       );
+
       // Update each section in the database
       subSectionsWithNewOrder.forEach(async (subsection) => {
         try {
+          const token = await getToken();
           await axios.put(
-            ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${section._id}/${subsection._id}`,
+            `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${section._id}/${subsection._id}`,
             {
               order: subsection.order,
             },
             {
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+              },
             }
           );
         } catch (err) {
@@ -239,7 +238,7 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
             <>
               <DragIndicatorIcon
                 {...listeners}
-                className="text-gray-500 mr-4"
+                className="text-gray-500 mr-4 cursor-grab "
               />
               <ListItemText
                 onClick={handleSectionClick}
@@ -251,12 +250,15 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
                 }
               />
               <AddIcon
-                onClick={handleAddSubsectionClick}
+                onClick={() => {
+                  setOpen(true);
+                  setIsAddingSubsection(true);
+                }}
                 className="absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible right-12"
               />
               <MoreHorizIcon
                 className={`absolute text-gray-500 rounded-full hover:text-white hover:bg-gray-500 z-40 cursor-pointer group-hover:visible invisible  right-20`}
-                onClick={handleMoreHorizClick}
+                onClick={(event) => setAnchorEl(event.currentTarget)}
               />
               <Menu
                 anchorEl={anchorEl}
@@ -268,7 +270,12 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
                   Edit Title
                 </MenuItem>
 
-                <MenuItem onClick={handleDeleteSectionClick}>
+                <MenuItem
+                  onClick={() => {
+                    setAnchorEl(null);
+                    setOpenDeleteSectionDialog(true);
+                  }}
+                >
                   <DeleteIcon sx={{ marginRight: "5px" }} />
                   Delete Section
                 </MenuItem>
@@ -297,7 +304,10 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
               />
               <ClearIcon
                 className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
-                onClick={handleCancelEditTitleSection}
+                onClick={() => {
+                  setIsEditingTitle(false);
+                  setAnchorEl(null);
+                }}
               />
             </div>
           )}
@@ -343,7 +353,7 @@ function Section({ id, section, classroomId, reloadClassroomData }) {
               />
               <ClearIcon
                 className="cursor-pointer hover:bg-slate-400 rounded-sm ml-3"
-                onClick={handleCancelAddSubsection}
+                onClick={() => setIsAddingSubsection(false)}
               />
             </div>
           )}

@@ -1,5 +1,6 @@
 import { useState, createElement, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 
 import {
@@ -22,13 +23,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import UploadIcon from "@mui/icons-material/Upload";
-
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 import Columns from "./Columns";
+import { uploadfile } from "../utils/uploadfile";
 
 function Sidebar() {
-  // [1]
   const navigator = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -41,14 +41,23 @@ function Sidebar() {
     useState(false);
   const [isLoadingDeleteClassroom, setIsLoadingDeleteClassroom] =
     useState(false);
+  const { getToken } = useAuth();
 
+  // Fetch classroom data
   useEffect(() => {
     async function fetchClassroom() {
       setIsLoading(true);
+      const token = await getToken();
       try {
         const response = await fetch(
-          " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/" +
-            id
+          "http://127.0.0.1:3000/api/v1/classrooms/" + id,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+          }
         );
         const data = await response.json();
         if (!response.ok) {
@@ -68,6 +77,12 @@ function Sidebar() {
     fetchClassroom();
   }, [id, reload]);
 
+  // Set latest title and description
+  useEffect(() => {
+    setTitle(classroomData.title);
+    setDescription(classroomData.description);
+  }, [classroomData]);
+
   // Edit Title State
   const [isEdittingTitle, setIsEdittingTitle] = useState(false);
   const [title, setTitle] = useState(classroomData.title);
@@ -82,29 +97,7 @@ function Sidebar() {
   const [image, setImage] = useState(null); //
   const [isLoadingUploadImage, setIsLoadingUploadImage] = useState(false);
 
-  useEffect(() => {
-    setTitle(classroomData.title);
-    setDescription(classroomData.description);
-  }, [classroomData]);
-
-  async function handleDeleteClassroom() {
-    setIsLoadingDeleteClassroom(true);
-    try {
-      const res = await axios.delete(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(
-          data.message || "An error occurred while deleting classroom"
-        );
-      }
-    } catch (err) {
-      setError(err.message || "An error occurred while deleting classroom");
-    }
-    setIsLoadingDeleteClassroom(false);
-    navigator("/instructor");
-  }
+  // Show image preview when upload but not yet submit
   const handleFileUpload = (event) => {
     let image_file = event.target.files[0];
 
@@ -119,53 +112,19 @@ function Sidebar() {
 
     setFile(image_file);
   };
-  function handleImageDialogOpen() {
-    setOpenImageDialog(true);
-  }
-  function handleImageDialogClose() {
-    setOpenImageDialog(false);
-  }
-  async function handleImageSubmit() {
-    console.log("submitting image");
-    setIsLoadingUploadImage(true);
-    const formData = new FormData();
-    formData.append("classroomImage", file);
-    try {
-      const res = await axios.put(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(
-          data.message || "An error occurred while updating classroom image"
-        );
-      }
-    } catch (err) {
-      setError(
-        err.message || "An error occurred while updating classroom image"
-      );
-    }
-    setIsLoadingUploadImage(false);
-    setOpenImageDialog(false);
-    setAnchorEl(null);
-    setReload((prev) => !prev);
-  }
-  function handleEditTitleClick() {
-    setAnchorEl(null);
-    setIsEdittingTitle(true);
-  }
+
+  ///////////////////////////////////////----------------------- Action -----------------------////////////////////////////////////
+
   async function handleEditTitleConfirm() {
+    const token = await getToken();
     try {
       const res = await fetch(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`,
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
           },
           body: JSON.stringify({ title }),
         }
@@ -185,19 +144,37 @@ function Sidebar() {
     setIsEdittingTitle(false);
     setReload((prev) => !prev);
   }
-  function handleEditDescriptionClick() {
+
+  async function handleImageSubmit() {
+    setIsLoadingUploadImage(true);
+    const token = await getToken();
+
+    try {
+      const res = await uploadfile(file, classroomData._id, file.type, token);
+      if (!res.ok) {
+        throw new Error("Failed to upload image!");
+      }
+    } catch (err) {
+      setError(
+        err.message || "An error occurred while updating classroom image"
+      );
+    }
+    setIsLoadingUploadImage(false);
+    setOpenImageDialog(false);
     setAnchorEl(null);
-    setIsEdittingDescription(true);
     setReload((prev) => !prev);
   }
+
   async function handleEditDescriptionConfirm() {
+    const token = await getToken();
     try {
       const res = await fetch(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomData._id}`,
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
           },
           body: JSON.stringify({ description }),
         }
@@ -217,6 +194,32 @@ function Sidebar() {
     }
     setIsEdittingDescription(false);
     setReload((prev) => !prev);
+  }
+
+  async function handleDeleteClassroom() {
+    setIsLoadingDeleteClassroom(true);
+    const token = await getToken();
+    try {
+      const res = await axios.delete(
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomData._id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          data.message || "An error occurred while deleting classroom"
+        );
+      }
+    } catch (err) {
+      setError(err.message || "An error occurred while deleting classroom");
+    }
+    setIsLoadingDeleteClassroom(false);
+    navigator("/instructor");
   }
 
   return (
@@ -264,15 +267,26 @@ function Sidebar() {
               open={open}
               onClose={() => setAnchorEl(null)}
             >
-              <MenuItem onClick={handleEditTitleClick}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setIsEdittingTitle(true);
+                }}
+              >
                 <EditIcon sx={{ marginRight: "5px" }} />
                 Edit Title
               </MenuItem>
-              <MenuItem onClick={handleEditDescriptionClick}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  setIsEdittingDescription(true);
+                  setReload((prev) => !prev);
+                }}
+              >
                 <EditIcon sx={{ marginRight: "5px" }} />
                 Edit Description
               </MenuItem>
-              <MenuItem onClick={handleImageDialogOpen}>
+              <MenuItem onClick={() => setOpenImageDialog(true)}>
                 <UploadIcon sx={{ marginRight: "5px" }} />
                 New Classroom Image
               </MenuItem>
@@ -316,15 +330,19 @@ function Sidebar() {
 
       <Dialog
         open={openImageDialog}
-        onClose={handleImageDialogClose}
+        onClose={() => setOpenImageDialog(false)}
         PaperProps={{
           component: "form",
         }}
       >
         <DialogTitle>Classroom Image</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ marginBottom: "20px" }}>
+          <DialogContentText sx={{ marginBottom: "3px" }}>
             Recommended Image Size: 1920 * 1080 (16:9)
+          </DialogContentText>
+          <DialogContentText sx={{ marginBottom: "18px", fontSize: "10px" }}>
+            *Note: There will be latency in updating the image, please wait
+            about 5 min to see the changes
           </DialogContentText>
           <DialogContentText>
             {image ? "Preview" : "Current Image"}
@@ -334,7 +352,10 @@ function Sidebar() {
               {image ? (
                 image
               ) : (
-                <img src={classroomData.imageURL} alt="classroom" />
+                <img
+                  src={`https://alpaca-learning-bucket.s3.ap-southeast-1.amazonaws.com/${classroomData._id}`}
+                  alt="classroom"
+                />
               )}
             </Card>
 
@@ -368,7 +389,7 @@ function Sidebar() {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleImageDialogClose}>Cancel</Button>
+          <Button onClick={() => setOpenImageDialog(false)}>Cancel</Button>
           <Button onClick={handleImageSubmit} disabled={!image}>
             Update
           </Button>

@@ -1,9 +1,7 @@
 import { Card, Typography } from "@mui/material";
-import alpacaLogo from "../../assets/alpacaLogo.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function ClassroomCard({ data }) {
-  console.log(data);
   return (
     <Link
       to={

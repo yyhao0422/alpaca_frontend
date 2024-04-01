@@ -1,10 +1,8 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
 import {
   Dialog,
   DialogActions,
@@ -13,14 +11,12 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
 
-import { useLocation, useNavigate } from "react-router-dom";
-
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
@@ -29,6 +25,7 @@ function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
   const [openDeleteSectionDialog, setOpenDeleteSectionDialog] = useState(false);
   const [isDeletingSection, setIsDeletingSection] = useState(false);
   const [error, setError] = useState("");
+  const { getToken } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -56,9 +53,15 @@ function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
 
   async function handleDeleteSubSection() {
     setIsDeletingSection(true);
+    const token = await getToken();
     try {
       const response = await axios.delete(
-        ` https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms/${classroomId}/${sectionId}/${subsection._id}`
+        `http://127.0.0.1:3000/api/v1/classrooms/${classroomId}/${sectionId}/${subsection._id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
       );
 
       if (response.status === 204) {
@@ -92,7 +95,7 @@ function SubSection({ id, subsection, sectionId, reloadClassroomData }) {
       >
         <DragHandleIcon
           {...listeners}
-          className="text-gray-500 cursor-grab mr-4"
+          className="text-gray-500 cursor-grab active:cursor-grabbing mr-4"
         />
         <ListItemText primary={subsection.title} />
         <DeleteIcon

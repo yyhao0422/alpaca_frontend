@@ -5,8 +5,6 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 
 function VideoUploadProgress({ showProgress, file, uploadedFile }) {
-  console.log(file);
-  console.log(uploadedFile);
   function LinearProgressWithLabel(props) {
     return (
       <Box sx={{ display: "flex", alignItems: "center" }}>

@@ -10,6 +10,7 @@ function VideoContent({ contentData }) {
   )?.playTime;
 
   const [currPlayTime, setCurrPlayTime] = useState();
+  console.log(contentData);
 
   useEffect(() => {
     const currentRef = playerRef.current;
@@ -27,7 +28,6 @@ function VideoContent({ contentData }) {
     console.log(startingTime);
     // Set the play time to last played time
     if (currentRef) {
-      console.log("setting time");
       currentRef.seekTo(startingTime);
     }
     setCurrPlayTime(startingTime);
@@ -65,7 +65,7 @@ function VideoContent({ contentData }) {
       ref={playerRef}
       onReady={handleReady}
       onProgress={handleProgress}
-      url={contentData.contentURL}
+      url={`https://alpaca-learning-bucket.s3.ap-southeast-1.amazonaws.com/${contentData._id}`}
       controls={true}
       width="100%"
       height="100%"
