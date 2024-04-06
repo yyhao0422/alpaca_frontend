@@ -8,7 +8,6 @@ import WebLayout from "../components/WebLayout.jsx";
 import Instructor from "../Instructor/pages/Instructor.jsx";
 import CreateClassroomPage from "../Instructor/pages/CreateClassroomPage.jsx";
 import ManageClassroomPage from "../Instructor/pages/ManageClassroomPage.jsx";
-import ErrorPage from "../pages/ErrorPage.jsx";
 import SuccessPaymentPage from "../pages/SuccessPaymentPage.jsx";
 
 export const signedInRouter = createBrowserRouter([

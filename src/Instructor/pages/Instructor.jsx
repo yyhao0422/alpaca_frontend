@@ -1,30 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth, useUser } from "@clerk/clerk-react";
-import { useSessionContext } from "../../utils/useSessionContext";
+import { useAuth } from "@clerk/clerk-react";
+import { useUserContext } from "../../utils/useUserContext";
 
-import {
-  Button,
-  Card,
-  Typography,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
+import { Button, Typography, CircularProgress, Alert } from "@mui/material";
 
 import ClassroomCard from "../components/ClassroomCard";
 
 function Instructor() {
-  const { isSignedIn, getToken } = useAuth();
+  const { getToken } = useAuth();
   const [classrooms, setClassrooms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const sessionCtx = useSessionContext();
+  const { session } = useUserContext();
 
   useEffect(() => {
     function validateAdmin() {
-      const isAdmin = sessionCtx.session.user.publicMetadata.admin
-        ? true
-        : false;
+      const isAdmin = session.user.publicMetadata.admin ? true : false;
 
       if (!isAdmin) {
         console.log("Unauthorised action !");
