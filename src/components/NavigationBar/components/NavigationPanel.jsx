@@ -9,7 +9,7 @@ function NavigationPanel() {
   return (
     <div className="flex mx-48 pt-3 ">
       <NavLink
-        to="/"
+        to="/subscribed"
         className={({ isActive, isPending }) =>
           isPending
             ? "m-2 mb-4"
@@ -17,11 +17,12 @@ function NavigationPanel() {
             ? "m-2 mb-4 underline underline-offset-[10px]"
             : "m-2 mb-4"
         }
+        end
       >
         Community
       </NavLink>
       <NavLink
-        to="/classroom"
+        to="/subscribed/classroom"
         className={({ isActive, isPending }) =>
           isPending
             ? "m-2 mb-4"
@@ -34,7 +35,7 @@ function NavigationPanel() {
       </NavLink>
 
       <NavLink
-        to={"/about"}
+        to={"/subscribed/about"}
         className={({ isActive, isPending }) =>
           isPending
             ? "m-2 mb-4"
@@ -47,7 +48,7 @@ function NavigationPanel() {
       </NavLink>
       {isAdmin && (
         <NavLink
-          to="/instructor"
+          to="/subscribed/instructor"
           className={({ isActive, isPending }) =>
             isPending
               ? "m-2 mb-4"

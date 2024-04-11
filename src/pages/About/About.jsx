@@ -9,6 +9,10 @@ function About() {
   const { getToken } = useAuth();
   const { isSignedIn } = useUser();
 
+  // Check if the user is subscribed
+  // Not show the subscribe button if the user is already subscribed
+  const isSubscribed = window.location.pathname.split("/")[1] === "subscribed";
+
   async function handleSubscribe() {
     try {
       const token = await getToken();
@@ -46,17 +50,19 @@ function About() {
               <Divider orientation="vertical" flexItem />
               <p>Active</p>
             </div>
-            <div className="w-full flex items-center justify-center">
-              {isSignedIn ? (
-                <Button variant="outlined" onClick={handleSubscribe}>
-                  Subscribe Now
-                </Button>
-              ) : (
-                <Button variant="outlined">
-                  <SignInButton>Sign In To Subscribe</SignInButton>
-                </Button>
-              )}
-            </div>
+            {!isSubscribed && (
+              <div className="w-full flex items-center justify-center">
+                {isSignedIn ? (
+                  <Button variant="outlined" onClick={handleSubscribe}>
+                    Subscribe Now
+                  </Button>
+                ) : (
+                  <Button variant="outlined">
+                    <SignInButton>Sign In To Subscribe</SignInButton>
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="my-10">

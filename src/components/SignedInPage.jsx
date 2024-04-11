@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
-import { RouterProvider } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth, useSession } from "@clerk/clerk-react";
 
+import TopNavigationBar from "./NavigationBar/TopNavigationBar";
+import DesktopWrapper from "./Wrapper/DesktopWrapper";
+import AnonymousNavigationBar from "./NavigationBar/AnonymousNavigationBar";
 import LoadingBackdrop from "../utils/LoadingBackdrop";
-import { signedInRouter } from "../router/signedInRouter";
 import { UserContext } from "../store/UserContext";
+
+// This component is a wrapper for providing the subscription details and session to the children components
 
 function SignedInPage() {
   const { getToken } = useAuth();
   const { session } = useSession();
+  const navigate = useNavigate();
   const [subscriptionDetails, setSubscriptionDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,19 +35,33 @@ function SignedInPage() {
           }
         );
         const resData = await response.json();
+
         setSubscriptionDetails(resData.data.subscription);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
       setIsLoading(false);
     }
-
-    if (session.user.publicMetadata.subscriptionId) {
-      getStripeSubscription();
+    if (session) {
+      if (session.user.publicMetadata.subscriptionId) {
+        getStripeSubscription();
+      } else {
+        // Redirect to the unsubscribed page if the user has no subscriptionId
+        navigate("/unsubscribed");
+      }
     }
   }, [session]);
 
-  console.log(subscriptionDetails);
+  useEffect(() => {
+    // Redirect to the subscribed page if the user is subscribed
+    if (subscriptionDetails?.status === "active") {
+      navigate("/subscribed");
+    }
+    // Redirect to the unsubscribed page if the user is canceled
+    if (subscriptionDetails?.status === "canceled") {
+      navigate("/unsubscribed");
+    }
+  }, [subscriptionDetails]);
 
   return (
     <>
@@ -53,9 +72,16 @@ function SignedInPage() {
           value={{
             subscriptionDetails,
             session,
+            isSubscribed: subscriptionDetails?.status === "active",
           }}
         >
-          <RouterProvider router={signedInRouter} basename="/" />
+          <DesktopWrapper />
+          {subscriptionDetails?.status === "active" ? (
+            <TopNavigationBar />
+          ) : (
+            <AnonymousNavigationBar />
+          )}
+          <Outlet />
         </UserContext.Provider>
       )}
     </>

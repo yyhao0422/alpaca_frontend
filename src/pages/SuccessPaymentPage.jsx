@@ -22,7 +22,7 @@ function SuccessPaymentPage() {
         );
         const resData = await response.json();
         setMessage(resData.message);
-        navigate("/");
+        window.location.href = "/";
       } catch (e) {
         console.error(e);
         setMessage("Failed to get subscription data");
