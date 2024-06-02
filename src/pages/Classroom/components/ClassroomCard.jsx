@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 function ClassroomCard({ data }) {
   return (
     <Link
-      to={"/classroom/" + data._id}
+      to={"/subscribed/classroom/" + data._id}
       state={{ classroomData: data }}
       className=" m-5 ml-0 h-[400px]  flex cursor-pointer w-[300px] "
     >

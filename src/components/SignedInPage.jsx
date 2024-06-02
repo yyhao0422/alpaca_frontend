@@ -50,7 +50,7 @@ function SignedInPage() {
         navigate("/unsubscribed");
       }
     }
-  }, [session]);
+  }, []);
 
   useEffect(() => {
     // Redirect to the subscribed page if the user is subscribed

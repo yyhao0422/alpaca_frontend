@@ -5,7 +5,7 @@ function ClassroomCard({ data }) {
   return (
     <Link
       to={
-        "/instructor/classroom/manage/" +
+        "/subscribed/instructor/classroom/manage/" +
         data._id +
         "/" +
         (data.sections.length !== 0 ? data.sections[0]._id : "empty") +

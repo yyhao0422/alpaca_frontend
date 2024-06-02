@@ -71,7 +71,7 @@ function Instructor() {
       <div className="mt-10 flex justify-between">
         <Typography variant="h3">Classroom</Typography>
 
-        <Link to="/instructor/classroom/create">
+        <Link to="/subscribed/instructor/classroom/create">
           <Button variant="contained">New Classroom</Button>
         </Link>
       </div>
