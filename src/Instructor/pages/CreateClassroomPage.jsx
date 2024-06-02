@@ -1,21 +1,22 @@
 import { useState, createElement, useEffect } from "react";
 import { useBlocker, redirect } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
 
 import { Typography, Card, TextField, Button, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import LinearProgress from "@mui/material/LinearProgress";
+import { uploadfile } from "../utils/uploadfile";
 
 function CreateClassroomPage() {
   const [file, setFile] = useState("");
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const { getToken } = useAuth();
 
   // Alert user from leaving the page
-
   let blocker = useBlocker((transition) => {
     if (
       !window.confirm(
@@ -26,85 +27,7 @@ function CreateClassroomPage() {
     }
   }, []);
 
-  async function handlePostClassroom(title, description) {
-    try {
-      const resCreateClassroom = await axios.post(
-        " https://jvfyvntgi3.execute-api.ap-southeast-1.amazonaws.com/dev/api/v1/classrooms",
-        {
-          title,
-          description,
-        }
-      );
-
-      const data = resCreateClassroom.data.data;
-      return data;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async function handleUploadImage(file, key) {
-    try {
-      console.log("start uploading image");
-      console.log(file);
-      console.log(key);
-
-      const resUploadImage = await fetch(
-        `https://sujmw6qeyf.execute-api.ap-southeast-1.amazonaws.com/dev/uploads/alpaca-learning-bucket/${key}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "image/jpeg",
-          },
-          body: file,
-        }
-      );
-
-      const data = await resUploadImage.json();
-      return data;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    setIsLoading(true);
-    console.log("submitting");
-
-    try {
-      const dataPostClassroom = await handlePostClassroom(
-        event.target[0].value,
-        event.target[2].value
-      );
-      console.log("dataPostClassroom", dataPostClassroom.classroom);
-      console.log(dataPostClassroom.classroom.id);
-      if (dataPostClassroom instanceof Error) {
-        throw dataPostClassroom;
-      }
-
-      const dataUploadImage = await handleUploadImage(
-        file,
-        dataPostClassroom.classroom.id
-      );
-      if (dataUploadImage instanceof Error) {
-        throw dataUploadImage;
-      }
-
-      // window.location.href = "/instructor";
-      // blocker.proceed();
-    } catch (error) {
-      console.log("error", error);
-      setError(
-        error || "An error occurred while creating classroom! Please try again."
-      );
-      // window.location.href = "/instructor";
-      // blocker.proceed();
-    }
-    setIsLoading(false);
-  }
-
+  // Show the file when user upload it but havent submit the post to the server
   const handleFileUpload = (event) => {
     let image_file = event.target.files[0];
 
@@ -119,6 +42,67 @@ function CreateClassroomPage() {
 
     setFile(image_file);
   };
+  ///////////////////////////////////////----------------------- Action -----------------------////////////////////////////////////
+
+  // Post classroom to the express server
+  async function handlePostClassroom(title, description, token) {
+    try {
+      const resCreateClassroom = await fetch(
+        "http://127.0.0.1:3000/api/v1/classrooms",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({
+            title,
+            description,
+          }),
+        }
+      );
+
+      const resData = await resCreateClassroom.json();
+      return resData.data;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // Handle Submit form Action
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    setIsLoading(true);
+    const token = await getToken();
+
+    try {
+      const dataPostClassroom = await handlePostClassroom(
+        event.target[0].value,
+        event.target[2].value,
+        token
+      );
+
+      const dataUploadImage = await uploadfile(
+        file,
+        dataPostClassroom.classroom.id,
+        file.type,
+        token
+      );
+      console.log(dataUploadImage);
+
+      window.location.href = "/instructor";
+      blocker.proceed();
+    } catch (error) {
+      console.log("error", error);
+      setError(
+        error || "An error occurred while creating classroom! Please try again."
+      );
+      window.location.href = "/instructor";
+      blocker.proceed();
+    }
+    setIsLoading(false);
+  }
 
   return (
     <div className="mx-48">
@@ -201,7 +185,7 @@ function CreateClassroomPage() {
                 variant="caption"
                 sx={{ marginLeft: "10px", color: "#6c757d" }}
               >
-                {file.name}
+                {file.name || "File must less thatn 10 MB"}
               </Typography>
             </div>
           </div>

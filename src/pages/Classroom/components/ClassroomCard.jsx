@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 function ClassroomCard({ data }) {
   return (
     <Link
-      to={"/classroom/" + data._id}
+      to={"/subscribed/classroom/" + data._id}
       state={{ classroomData: data }}
       className=" m-5 ml-0 h-[400px]  flex cursor-pointer w-[300px] "
     >
@@ -19,7 +19,7 @@ function ClassroomCard({ data }) {
       >
         <div className="flex flex-col">
           <img
-            className="w-[350px]"
+            className="h-[200px] w-[500px] object-cover"
             src={`https://alpaca-learning-bucket.s3.ap-southeast-1.amazonaws.com/${data._id}`}
             alt="classroom pictures"
           />

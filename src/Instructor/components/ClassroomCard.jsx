@@ -1,13 +1,11 @@
 import { Card, Typography } from "@mui/material";
-import alpacaLogo from "../../assets/alpacaLogo.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function ClassroomCard({ data }) {
-  console.log(data);
   return (
     <Link
       to={
-        "/instructor/classroom/manage/" +
+        "/subscribed/instructor/classroom/manage/" +
         data._id +
         "/" +
         (data.sections.length !== 0 ? data.sections[0]._id : "empty") +

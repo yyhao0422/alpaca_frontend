@@ -26,6 +26,10 @@ function Section({ section, onShow, itemActive }) {
     setOpen(!open);
   }
 
+  const sortedSubsections = section.subsections.sort((a, b) =>
+    a.order > b.order ? 1 : b.order > a.order ? -1 : 0
+  );
+
   return (
     <>
       <ListItemButton onClick={handleSectionClick}>
@@ -39,7 +43,7 @@ function Section({ section, onShow, itemActive }) {
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {section.subsections.map((subsection) => {
+          {sortedSubsections.map((subsection) => {
             return (
               <ListItemButton
                 sx={{ pl: 4 }}
